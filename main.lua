@@ -9,19 +9,27 @@ f:RegisterEvent("ADDON_LOADED")
 f:SetScript("OnEvent", function (self, event, arg1)
 	if event == "ADDON_LOADED" and arg1 == "DC-TotalHealerMana" then
 		thm.onLoad()
+	elseif event == "VARIABLES_LOADED" and arg1 == "DC-TotalHealerMana" then
+		thm.setDefaultValues()
+	elseif event == "UNIT_POWER_UPDATE" then
+		f.title:SetText(thm.updateData())
+	end
+end)
+
+function thm.setDefaultValues()
 		if DC_TotalHealerMana == nil then
 			DC_TotalHealerMana = {}
 			DC_TotalHealerMana.full = false
 		end
 		if not DC_TotalHealerMana[doWarn] ~= nil then
-			DC_TotalHealerMana.doWarn = true;
+			DC_TotalHealerMana.doWarn = false;
 			DC_TotalHealerMana.warnAt = 25;
 			DC_TotalHealerMana.critical = 10;
 		end
-	elseif event == "UNIT_POWER_UPDATE" then
-		f.title:SetText(thm.updateData())
-	end
-end)
+		if  not DC_TotalHealerMana[blacklist] ~= nil then
+			DC_TotalHealerMana.blacklist = {};
+		end
+end
 
 f:SetMovable(true)
 f:EnableMouse(true)
@@ -29,8 +37,6 @@ f:RegisterForDrag("RightButton")
 f:SetScript("OnDragStart", f.StartMoving)
 f:SetScript("OnDragStop", f.StopMovingOrSizing)
 	
-local blacklist = {};
-
 function thm:getIndex(t, v)
 	local i = 1;
 	
@@ -45,12 +51,12 @@ function thm:getIndex(t, v)
 end
 
 function thm:blacklistPlayer(player)
-	local index = thm:getIndex(blacklist, player)
+	local index = thm:getIndex(DC_TotalHealerMana.blacklist, player)
 	if (index > 0) then
-		table.remove(blacklist, index)
+		table.remove(DC_TotalHealerMana.blacklist, index)
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " no longer blacklisted")
 	else
-		table.insert(blacklist, player)
+		table.insert(DC_TotalHealerMana.blacklist, player)
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " blacklisted")
 	end
 end
@@ -61,7 +67,7 @@ function thm:updateData(msg)
 
 		local total, totalMax = 0, 0
 		for groupindex = 1,players do
-			if not tContains(blacklist, GetUnitName("raid"..groupindex)) then
+			if not tContains(DC_TotalHealerMana.blacklist, GetUnitName("raid"..groupindex)) then
 				local id = select(3, UnitClass("raid"..groupindex))
 				if (id == 2 or id == 5 or id == 11 or id == 7) then
 					total = total + UnitPower("raid"..groupindex,0)
@@ -102,7 +108,7 @@ function thm:updateData(msg)
 
 		local total, totalMax = 0, 0
 		for groupindex = 1,players do
-			if not tContains(blacklist, GetUnitName("party"..groupindex)) then
+			if not tContains(DC_TotalHealerMana.blacklist, GetUnitName("party"..groupindex)) then
 				local id = select(3, UnitClass("party"..groupindex))
 				if (id == 2 or id == 5 or id == 11 or id == 7) then
 					total = total + UnitPower("party"..groupindex,0)
@@ -111,7 +117,7 @@ function thm:updateData(msg)
 			end
 		end
 		
-		if not tContains(blacklist, GetUnitName("player")) then
+		if not tContains(DC_TotalHealerMana.blacklist, GetUnitName("player")) then
 			local id = select(3, UnitClass("player"))
 			if (id == 2 or id == 5 or id == 11 or id == 7) then
 				total = total + UnitPower("player",0);
