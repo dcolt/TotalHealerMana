@@ -183,6 +183,7 @@ local function main(msg)
 	
 	if msg_split[1] == "toggle" then
 		DC_TotalHealerMana.full = not DC_TotalHealerMana.full
+		main("")
 	elseif msg_split[1] == "bl" then
 		thm:blacklistPlayer(thm:firstUpper(msg_split[2]))
 	elseif msg_split[1] == "w" then
