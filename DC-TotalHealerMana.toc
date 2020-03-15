@@ -1,7 +1,7 @@
-## Interface: 11303
+## Interface: 11304
 ## Author: Dragoncolt-Firemaw
 ## Title: Total Healer Mana
-## Version: 1.3
+## Version: 1.4
 ## Notes: Show all healers mana as a single pool
 ## SavedVariables: DC_TotalHealerMana
 ## SavedVariablesPerCharacter: DC-TotalHealerMana-Frame
