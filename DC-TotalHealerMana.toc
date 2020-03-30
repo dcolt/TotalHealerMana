@@ -1,9 +1,9 @@
 ## Interface: 11304
 ## Author: Dragoncolt-Firemaw
 ## Title: Total Healer Mana
-## Version: 1.4
+## Version: 1.4.1
 ## Notes: Show all healers mana as a single pool
-## SavedVariables: DC_TotalHealerMana
+## SavedVariables: DCTHM
 ## SavedVariablesPerCharacter: DC-TotalHealerMana-Frame
 
 main.lua

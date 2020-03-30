@@ -9,27 +9,27 @@ f:RegisterEvent("ADDON_LOADED")
 f:SetScript("OnEvent", function (self, event, arg1)
 	if event == "ADDON_LOADED" and arg1 == "DC-TotalHealerMana" then
 		thm.onLoad()
-	elseif event == "VARIABLES_LOADED" and arg1 == "DC-TotalHealerMana" then
-		thm.setDefaultValues()
 	elseif event == "UNIT_POWER_UPDATE" then
 		f.title:SetText(thm.updateData())
 	end
 end)
 
 function thm.setDefaultValues()
-		if DC_TotalHealerMana == nil then
-			DC_TotalHealerMana = {}
-			DC_TotalHealerMana.full = false
+		if not DCTHM ~= nil then
+			DCTHM = {}
+			DCTHM.full = false
 		end
-		if not DC_TotalHealerMana[doWarn] ~= nil then
-			DC_TotalHealerMana.doWarn = false;
-			DC_TotalHealerMana.warnAt = 25;
-			DC_TotalHealerMana.critical = 10;
+		if not DCTHM[doWarn] ~= nil then
+			DCTHM.doWarn = false;
+			DCTHM.warnAt = 25;
+			DCTHM.critical = 10;
 		end
-		if  not DC_TotalHealerMana[blacklist] ~= nil then
-			DC_TotalHealerMana.blacklist = {};
+		if  not DCTHM[blacklist] ~= nil then
+			DCTHM.blacklist = {};
 		end
 end
+
+thm.setDefaultValues()
 
 f:SetMovable(true)
 f:EnableMouse(true)
@@ -51,12 +51,12 @@ function thm:getIndex(t, v)
 end
 
 function thm:blacklistPlayer(player)
-	local index = thm:getIndex(DC_TotalHealerMana.blacklist, player)
+	local index = thm:getIndex(DCTHM.blacklist, player)
 	if (index > 0) then
-		table.remove(DC_TotalHealerMana.blacklist, index)
+		table.remove(DCTHM.blacklist, index)
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " no longer blacklisted")
 	else
-		table.insert(DC_TotalHealerMana.blacklist, player)
+		table.insert(DCTHM.blacklist, player)
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " blacklisted")
 	end
 end
@@ -67,7 +67,7 @@ function thm:updateData(msg)
 
 		local total, totalMax = 0, 0
 		for groupindex = 1,players do
-			if not tContains(DC_TotalHealerMana.blacklist, GetUnitName("raid"..groupindex)) then
+			if not tContains(DCTHM.blacklist, GetUnitName("raid"..groupindex)) then
 				local id = select(3, UnitClass("raid"..groupindex))
 				if (id == 2 or id == 5 or id == 11 or id == 7) then
 					total = total + UnitPower("raid"..groupindex,0)
@@ -78,18 +78,18 @@ function thm:updateData(msg)
 	
 		local persentage = (100*(total/totalMax))
 		local output = string.format("%.0f%%", persentage)
-		if DC_TotalHealerMana.full then
+		if DCTHM.full then
 			output = output .. string.format(" - %d/%d", total, totalMax)
 		end
 		
 		thm:resetWarnings(persentage)
 
-		if DC_TotalHealerMana.doWarn then
-			if not thm.hasWarned and persentage < DC_TotalHealerMana.warnAt then
+		if DCTHM.doWarn then
+			if not thm.hasWarned and persentage < DCTHM.warnAt then
 				thm.hasWarned = true
 				SendChatMessage("Warning: Low healer mana! "..string.format("%.0f%%", persentage), "RAID_WARNING")
 			end
-			if not thm.hasCritical and persentage < DC_TotalHealerMana.critical then
+			if not thm.hasCritical and persentage < DCTHM.critical then
 				thm.hasCritical = true
 				SendChatMessage("Critical: Low healer mana! "..string.format("%.0f%%", persentage), "RAID_WARNING")
 			end
@@ -108,7 +108,7 @@ function thm:updateData(msg)
 
 		local total, totalMax = 0, 0
 		for groupindex = 1,players do
-			if not tContains(DC_TotalHealerMana.blacklist, GetUnitName("party"..groupindex)) then
+			if not tContains(DCTHM.blacklist, GetUnitName("party"..groupindex)) then
 				local id = select(3, UnitClass("party"..groupindex))
 				if (id == 2 or id == 5 or id == 11 or id == 7) then
 					total = total + UnitPower("party"..groupindex,0)
@@ -117,7 +117,7 @@ function thm:updateData(msg)
 			end
 		end
 		
-		if not tContains(DC_TotalHealerMana.blacklist, GetUnitName("player")) then
+		if not tContains(DCTHM.blacklist, GetUnitName("player")) then
 			local id = select(3, UnitClass("player"))
 			if (id == 2 or id == 5 or id == 11 or id == 7) then
 				total = total + UnitPower("player",0);
@@ -127,20 +127,22 @@ function thm:updateData(msg)
 
 		local persentage = (100*(total/totalMax))
 		local output = string.format("%.0f%%", persentage)
-		if DC_TotalHealerMana.full then
+		if DCTHM.full then
 			output = output .. string.format(" - %d/%d", total, totalMax)
 		end
 		
 		thm:resetWarnings(persentage)
 
-		if DC_TotalHealerMana.doWarn then
-			if not thm.hasWarned and persentage < DC_TotalHealerMana.warnAt then
+		if DCTHM.doWarn then
+			if not thm.hasWarned and persentage < DCTHM.warnAt then
 				thm.hasWarned = true
 				SendChatMessage("Warning: Low healer mana! "..string.format("%.0f%%", persentage), "PARTY")
+				print("Warning: Low healer mana! "..string.format("%.0f%%", persentage))
 			end
-			if not thm.hasCritical and persentage < DC_TotalHealerMana.critical then
+			if not thm.hasCritical and persentage < DCTHM.critical then
 				thm.hasCritical = true
 				SendChatMessage("Critical: Low healer mana! "..string.format("%.0f%%", persentage), "PARTY")
+				print("Critical: Low healer mana! "..string.format("%.0f%%", persentage))
 			end
 		end
 		
@@ -166,10 +168,10 @@ end
 
 function thm:resetWarnings(persentage)
 	if not InCombatLockdown() then
-		if persentage > DC_TotalHealerMana.warnAt + 10 then
+		if persentage > DCTHM.warnAt + 10 then
 			thm.hasWarned = false
 		end
-		if persentage > DC_TotalHealerMana.critical + 10 then
+		if persentage > DCTHM.critical + 10 then
 			thm.hasCritical = false
 		end
 	end
@@ -182,13 +184,13 @@ local function main(msg)
 	end
 	
 	if msg_split[1] == "toggle" then
-		DC_TotalHealerMana.full = not DC_TotalHealerMana.full
+		DCTHM.full = not DCTHM.full
 	elseif msg_split[1] == "bl" then
 		thm:blacklistPlayer(thm:firstUpper(msg_split[2]))
 	elseif msg_split[1] == "w" then
 		if msg_split[2] == "toggle" then
-			DC_TotalHealerMana.doWarn = not DC_TotalHealerMana.doWarn
-			if DC_TotalHealerMana.doWarn then
+			DCTHM.doWarn = not DCTHM.doWarn
+			if DCTHM.doWarn then
 				DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r Will now show a warning")
 			else
 				DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r Will not show a warning")
@@ -196,14 +198,14 @@ local function main(msg)
 		else
 			local amount = tonumber(msg_split[2])
 			if amount > 0 and amount < 100 then
-				DC_TotalHealerMana.warnAt = amount
+				DCTHM.warnAt = amount
 				DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r Warning limit set to " .. amount)
 			end
 		end
 	elseif msg_split[1] == "wc" then
 		local amount = tonumber(msg_split[2])
 		if amount > 0 and amount < 100 then
-			DC_TotalHealerMana.critical = amount
+			DCTHM.critical = amount
 				DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r Critical limit set to " .. amount)
 		end
 	else 
