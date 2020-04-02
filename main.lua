@@ -174,7 +174,11 @@ function thm:updateData(msg)
 end
 
 function thm:firstUpper(str)
-	return string.upper(str:sub(1,1))..string.lower(str:sub(2))
+	if not str then
+		return string.upper(str:sub(1,1))..string.lower(str:sub(2))
+	else
+		return
+	end
 end
 
 function thm:resetWarnings(persentage)
