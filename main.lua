@@ -57,7 +57,6 @@ function thm:blacklistPlayer(player)
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r ~ Current Blacklist ~")
 		local blStr = table.concat(blacklist, "\n|cff00D1FFTHM:|r ")
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. blStr)
-		end
 		
 	-- Otherwise, add or remove the named player from the blacklist
 	else
