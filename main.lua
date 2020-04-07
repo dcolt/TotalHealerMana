@@ -55,7 +55,6 @@ function thm:blacklistPlayer(player)
 	-- If no name entered for blacklist command, print current blacklist
 	if player == nil then
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r ~ Current Blacklist ~")
-		for index, blplayer in ipairs(blacklist) do
 			DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. blplayer)
 		end
 		
