@@ -55,7 +55,8 @@ function thm:blacklistPlayer(player)
 	-- If no name entered for blacklist command, print current blacklist
 	if player == nil then
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r ~ Current Blacklist ~")
-			DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. blplayer)
+		local blStr = table.concat(blacklist, "\n|cff00D1FFTHM:|r ")
+		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. blStr)
 		end
 		
 	-- Otherwise, add or remove the named player from the blacklist
