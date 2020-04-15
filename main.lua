@@ -51,13 +51,23 @@ function thm:getIndex(t, v)
 end
 
 function thm:blacklistPlayer(player)
-	local index = thm:getIndex(DCTHM.blacklist, player)
-	if (index > 0) then
-		table.remove(DCTHM.blacklist, index)
-		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " no longer blacklisted")
+	
+	-- If no name entered for blacklist command, print current blacklist
+	if player == nil then
+		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r ~ Current Blacklist ~")
+		local blStr = table.concat(blacklist, "\n|cff00D1FFTHM:|r ")
+		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. blStr)
+		
+	-- Otherwise, add or remove the named player from the blacklist
 	else
-		table.insert(DCTHM.blacklist, player)
-		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " blacklisted")
+		local index = thm:getIndex(DCTHM.blacklist, player)
+		if (index > 0) then
+			table.remove(DCTHM.blacklist, index)
+			DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " no longer blacklisted")
+		else
+			table.insert(DCTHM.blacklist, player)
+			DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. player .. " blacklisted")
+		end
 	end
 end
 
@@ -163,7 +173,11 @@ function thm:updateData(msg)
 end
 
 function thm:firstUpper(str)
-	return string.upper(str:sub(1,1))..string.lower(str:sub(2))
+	if not str then
+		return string.upper(str:sub(1,1))..string.lower(str:sub(2))
+	else
+		return
+	end
 end
 
 function thm:resetWarnings(persentage)
