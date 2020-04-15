@@ -55,7 +55,7 @@ function thm:blacklistPlayer(player)
 	-- If no name entered for blacklist command, print current blacklist
 	if player == nil then
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r ~ Current Blacklist ~")
-		local blStr = table.concat(blacklist, "\n|cff00D1FFTHM:|r ")
+		local blStr = table.concat(DCTHM.blacklist, "\n|cff00D1FFTHM:|r ")
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r " .. blStr)
 		
 	-- Otherwise, add or remove the named player from the blacklist
@@ -173,11 +173,7 @@ function thm:updateData(msg)
 end
 
 function thm:firstUpper(str)
-	if not str then
-		return string.upper(str:sub(1,1))..string.lower(str:sub(2))
-	else
-		return
-	end
+	return string.upper(str:sub(1,1))..string.lower(str:sub(2))
 end
 
 function thm:resetWarnings(persentage)
@@ -200,7 +196,10 @@ local function main(msg)
 	if msg_split[1] == "toggle" then
 		DCTHM.full = not DCTHM.full
 	elseif msg_split[1] == "bl" then
-		thm:blacklistPlayer(thm:firstUpper(msg_split[2]))
+		if #msg_split >=2 then
+			msg_split[2] = thm:firstUpper(msg_split[2]);
+		end
+		thm:blacklistPlayer(msg_split[2]);
 	elseif msg_split[1] == "w" then
 		if msg_split[2] == "toggle" then
 			DCTHM.doWarn = not DCTHM.doWarn
