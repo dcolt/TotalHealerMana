@@ -6,27 +6,76 @@ local f = CreateFrame("StatusBar", "THM_Frame",UIParent)
 
 f:RegisterEvent("UNIT_POWER_UPDATE")
 f:RegisterEvent("ADDON_LOADED")
-f:SetScript("OnEvent", function (self, event, arg1)
-	if event == "ADDON_LOADED" and arg1 == "DC-TotalHealerMana" then
+f:RegisterEvent("GROUP_JOINED")
+f:RegisterEvent("GROUP_ROSTER_UPDATE")
+
+function f:ADDON_LOADED(addonName)
+	if addonName == "DC-TotalHealerMana" then
+		f:UnregisterEvent('ADDON_LOADED')
 		thm.onLoad()
-	elseif event == "UNIT_POWER_UPDATE" then
-		f.title:SetText(thm.updateData())
+		f:RegisterEvent("CHAT_MSG_ADDON")
+		C_ChatInfo.RegisterAddonMessagePrefix("DCTHM")
 	end
+end
+
+function f:UNIT_POWER_UPDATE()
+	f.title:SetText(thm.updateData())
+end
+
+function f:GROUP_JOINED()
+	local amountInGroup = GetNumGroupMembers()
+	if amountInGroup == 1 then
+		DCTHM.doWarn = true
+	else
+		DCTHM.doWarn = false
+	end
+end
+
+thm.timer = C_Timer.NewTimer(0.5, function()
+end);
+thm.timer:Cancel()
+
+function f:GROUP_ROSTER_UPDATE(...)
+	if IsInGroup() and UnitIsGroupLeader("player") then
+		DCTHM.doWarn = true
+	elseif IsInRaid() then
+		for raidIndex = 1,GetNumGroupMembers() do
+			local me = GetUnitName("player")
+			if GetUnitName("raid"..raidIndex) == me then
+				local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(raidIndex)
+				if rank > 0 then
+					C_ChatInfo.SendAddonMessage("DCTHM", "Can I Warn?", "RAID")
+					thm.timer = C_Timer.NewTimer(0.05, function()
+						DCTHM.doWarn = true
+					end)
+				end
+			end
+		end
+	end
+end
+
+function f:CHAT_MSG_ADDON(prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID)
+	if channel == "RAID" and prefix == "DCTHM" and target ~= GetUnitName("player", true) then
+		thm.timer:Cancel()
+		print("CHAT_MSG_ADDON")
+		print(prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID)
+	end
+end
+
+f:SetScript("OnEvent", function (self, event, ...)
+	return self[event](self,...)
 end)
 
 function thm.setDefaultValues()
-		if not DCTHM ~= nil then
-			DCTHM = {}
-			DCTHM.full = false
-		end
-		if not DCTHM[doWarn] ~= nil then
-			DCTHM.doWarn = false;
-			DCTHM.warnAt = 25;
-			DCTHM.critical = 10;
-		end
-		if  not DCTHM[blacklist] ~= nil then
-			DCTHM.blacklist = {};
-		end
+	DCTHM = _G["DCTHM"] or {["full"] = false}
+	if DCTHM[doWarn] == nil then
+		DCTHM.doWarn = false;
+		DCTHM.warnAt = 25;
+		DCTHM.critical = 10;
+	end
+	if  DCTHM[blacklist] == nil then
+		DCTHM.blacklist = {};
+	end
 end
 
 thm.setDefaultValues()
