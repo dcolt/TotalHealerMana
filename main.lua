@@ -140,6 +140,10 @@ function thm:updateData(msg)
 		if DCTHM.full then
 			output = output .. string.format(" - %d/%d", total, totalMax)
 		end
+
+		if not (totalMax > 0) then
+			return
+		end
 		
 		thm:resetWarnings(persentage)
 
@@ -188,6 +192,10 @@ function thm:updateData(msg)
 		local output = string.format("%.0f%%", persentage)
 		if DCTHM.full then
 			output = output .. string.format(" - %d/%d", total, totalMax)
+		end
+
+		if not (totalMax > 0) then
+			return
 		end
 		
 		thm:resetWarnings(persentage)
