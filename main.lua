@@ -57,8 +57,8 @@ end
 function f:CHAT_MSG_ADDON(prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID)
 	if channel == "RAID" and prefix == "DCTHM" and target ~= GetUnitName("player", true) then
 		thm.timer:Cancel()
-		print("CHAT_MSG_ADDON")
-		print(prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID)
+		--print("CHAT_MSG_ADDON")
+		--print(prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID)
 	end
 end
 
@@ -196,12 +196,12 @@ function thm:updateData(msg)
 			if not thm.hasWarned and persentage < DCTHM.warnAt then
 				thm.hasWarned = true
 				SendChatMessage("Warning: Low healer mana! "..string.format("%.0f%%", persentage), "PARTY")
-				print("Warning: Low healer mana! "..string.format("%.0f%%", persentage))
+				--print("Warning: Low healer mana! "..string.format("%.0f%%", persentage))
 			end
 			if not thm.hasCritical and persentage < DCTHM.critical then
 				thm.hasCritical = true
 				SendChatMessage("Critical: Low healer mana! "..string.format("%.0f%%", persentage), "PARTY")
-				print("Critical: Low healer mana! "..string.format("%.0f%%", persentage))
+				--print("Critical: Low healer mana! "..string.format("%.0f%%", persentage))
 			end
 		end
 		
