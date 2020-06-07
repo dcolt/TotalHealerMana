@@ -35,28 +35,39 @@ thm.timer = C_Timer.NewTimer(0.5, function()
 end);
 thm.timer:Cancel()
 
+function thm:GetRaidIndex()
+	local index = 0;
+	for raidIndex = 1,GetNumGroupMembers() do
+		local me = GetUnitName("player")
+		if GetUnitName("raid"..raidIndex) == me then
+			index = raidIndex
+		end
+	end
+	return index
+end
+
+local raids = {"Blackwing Lair", "Molten Core", "Ruins of Ahn'Qiraj", "Temple of Ahn'Qiraj", "Zul'Gurub", "Naxxramas", "Onyxia's Lair"}
+
 function f:GROUP_ROSTER_UPDATE(...)
-	if IsInGroup() and UnitIsGroupLeader("player") then
-		DCTHM.doWarn = true
-	elseif IsInRaid() then
-		for raidIndex = 1,GetNumGroupMembers() do
-			local me = GetUnitName("player")
-			if GetUnitName("raid"..raidIndex) == me then
+	if IsInRaid() then
+		if tContains(raids, GetZoneText()) then
+			local raidIndex = thm:GetRaidIndex()
+			if raidIndex > 0 then
 				local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(raidIndex)
 				if rank > 0 then
-					C_ChatInfo.SendAddonMessage("DCTHM", "Can I Warn?", "RAID")
-					thm.timer = C_Timer.NewTimer(0.05, function()
-						DCTHM.doWarn = true
-					end)
+					C_ChatInfo.SendAddonMessage("DCTHM", raidIndex, "RAID")
+					DCTHM.doWarn = true
 				end
 			end
+		else
+			DCTHM.doWarn = false
 		end
 	end
 end
 
 function f:CHAT_MSG_ADDON(prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID)
 	if channel == "RAID" and prefix == "DCTHM" and target ~= GetUnitName("player", true) then
-		thm.timer:Cancel()
+		DCTHM.doWarn = thm:GetRaidIndex() < tonumber(text) or false
 		--print("CHAT_MSG_ADDON")
 		--print(prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID)
 	end
@@ -100,7 +111,6 @@ function thm:getIndex(t, v)
 end
 
 function thm:blacklistPlayer(player)
-	
 	-- If no name entered for blacklist command, print current blacklist
 	if player == nil then
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00D1FFTHM:|r ~ Current Blacklist ~")
